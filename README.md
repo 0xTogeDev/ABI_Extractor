@@ -1,6 +1,6 @@
-╔═╗╔╗ ╦  ╔═╗═╗ ╦╔╦╗╦═╗╔═╗╔═╗╔╦╗╔═╗╦═╗
-╠═╣╠╩╗║  ║╣ ╔╩╦╝ ║ ╠╦╝╠═╣║   ║ ║ ║╠╦╝
-╩ ╩╚═╝╩  ╚═╝╩ ╚═ ╩ ╩╚═╩ ╩╚═╝ ╩ ╚═╝╩╚═
+╔═╗╔╗ ╦  ╔═╗═╗ ╦╔╦╗╦═╗╔═╗╔═╗╔╦╗╔═╗╦═╗ /n
+╠═╣╠╩╗║  ║╣ ╔╩╦╝ ║ ╠╦╝╠═╣║   ║ ║ ║╠╦╝ /n
+╩ ╩╚═╝╩  ╚═╝╩ ╚═ ╩ ╩╚═╩ ╩╚═╝ ╩ ╚═╝╩╚═ /n
 
 
 This Python script automatically searches for `.json` files containing smart contract ABIs in a specified directory and its subdirectories. It extracts the ABI part from each `.json` file and saves it into a new `.json` file in a folder named `extracted ABIs`. This tool is particularly useful for developers working with Ethereum smart contracts who need to manage and organize ABIs efficiently.
