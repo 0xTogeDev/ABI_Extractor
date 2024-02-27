@@ -25,20 +25,26 @@ def extract_and_save_abi(current_directory):
                 
                 # Open and read the .json file
                 with open(full_file_path, 'r', encoding='utf-8') as json_file:
-                    data = json.load(json_file)
-                    # Extract the ABI part
-                    abi = data.get('abi')
-                    if abi:
-                        # Generate the new file name and path within the "extracted ABIs" directory
-                        new_file_name = f"{os.path.splitext(file)[0]}ABI.json"
-                        new_file_path = os.path.join(abi_directory, new_file_name)
-                        
-                        # Write the ABI part to a new .json file
-                        with open(new_file_path, 'w', encoding='utf-8') as new_json_file:
-                            json.dump(abi, new_json_file, indent=4)
-                            print(f"ABI extracted and saved to {new_file_path}")
+                    try:
+                        data = json.load(json_file)
+                        # Skip files where data is a list or there's no ABI key in a dict
+                        if isinstance(data, list) or 'abi' not in data:
+                            continue
+                            
+                        abi = data['abi']
+                        if abi:
+                            # Construct the output file name and path
+                            output_file_name = f"{file[:-5]}ABI.json"
+                            output_file_path = os.path.join(abi_directory, output_file_name)
+                            
+                            # Write the ABI to a new .json file
+                            with open(output_file_path, 'w', encoding='utf-8') as abi_file:
+                                json.dump(abi, abi_file, indent=4)
+                            
+                            print(f"ABI extracted and saved to {output_file_path}")
+                    except json.JSONDecodeError as e:
+                        print(f"Error decoding JSON from file {full_file_path}: {e}")
 
 if __name__ == "__main__":
-    # Pass the current directory of the script
-    current_directory = os.path.dirname(os.path.abspath(__file__))
+    current_directory = os.getcwd()
     extract_and_save_abi(current_directory)
