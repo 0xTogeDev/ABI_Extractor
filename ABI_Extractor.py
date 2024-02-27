@@ -8,43 +8,54 @@
 import os
 import json
 
-def extract_and_save_abi(current_directory):
-    # Define the directory to store the extracted ABIs
-    abi_directory = os.path.join(current_directory, "extracted ABIs")
-    
-    # Check if the directory exists, if not, create it
-    if not os.path.exists(abi_directory):
-        os.makedirs(abi_directory)
-        print(f"Created directory: {abi_directory}")
+def create_directory_if_not_exists(directory_path):
+    """Ensures the specified directory exists, creating it if necessary."""
+    if not os.path.exists(directory_path):
+        os.makedirs(directory_path)
+        print(f"Created directory: {directory_path}")
 
-    for root, dirs, files in os.walk(current_directory):
+def is_valid_json_file(file_path):
+    """Checks if the file is a valid JSON file with an 'abi' key."""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as json_file:
+            data = json.load(json_file)
+            # Check if data is a dictionary and has an 'abi' key
+            return isinstance(data, dict) and 'abi' in data
+    except (json.JSONDecodeError, FileNotFoundError):
+        # Invalid JSON or file not found
+        return False
+    except Exception as e:
+        print(f"Unexpected error when validating JSON file {file_path}: {e}")
+        return False
+
+def extract_and_write_abi(source_file, target_path):
+    """Extracts ABI from the source file and writes it to the target path."""
+    with open(source_file, 'r', encoding='utf-8') as json_file:
+        data = json.load(json_file)
+        abi = data['abi']
+        
+    with open(target_path, 'w', encoding='utf-8') as abi_file:
+        json.dump(abi, abi_file, indent=4)
+    print(f"ABI extracted and saved to {target_path}")
+
+def process_directory_for_abi_files(directory):
+    """Processes all JSON files in the directory and its subdirectories for ABIs."""
+    abi_directory = os.path.join(directory, "extracted ABIs")
+    create_directory_if_not_exists(abi_directory)
+
+    for root, _, files in os.walk(directory):
         for file in files:
             if file.endswith('.json'):
-                # Construct the full file path
                 full_file_path = os.path.join(root, file)
-                
-                # Open and read the .json file
-                with open(full_file_path, 'r', encoding='utf-8') as json_file:
-                    try:
-                        data = json.load(json_file)
-                        # Skip files where data is a list or there's no ABI key in a dict
-                        if isinstance(data, list) or 'abi' not in data:
-                            continue
-                            
-                        abi = data['abi']
-                        if abi:
-                            # Construct the output file name and path
-                            output_file_name = f"{file[:-5]}ABI.json"
-                            output_file_path = os.path.join(abi_directory, output_file_name)
-                            
-                            # Write the ABI to a new .json file
-                            with open(output_file_path, 'w', encoding='utf-8') as abi_file:
-                                json.dump(abi, abi_file, indent=4)
-                            
-                            print(f"ABI extracted and saved to {output_file_path}")
-                    except json.JSONDecodeError as e:
-                        print(f"Error decoding JSON from file {full_file_path}: {e}")
+                if is_valid_json_file(full_file_path):
+                    output_file_name = f"{file[:-5]}ABI.json"
+                    output_file_path = os.path.join(abi_directory, output_file_name)
+                    extract_and_write_abi(full_file_path, output_file_path)
+
+def main():
+    """Main function to execute the script."""
+    current_directory = os.getcwd()
+    process_directory_for_abi_files(current_directory)
 
 if __name__ == "__main__":
-    current_directory = os.getcwd()
-    extract_and_save_abi(current_directory)
+    main()
